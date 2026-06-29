@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Craft Games | Indie Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        :root {
+            --bg-color: #0b0c10;
+            --secondary-bg: #1f2833;
+            --text-color: #c5c6c7;
+            --accent-color: #66fcf1;
+            --pure-white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        header {
+            background-color: rgba(31, 40, 51, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logo {
+            color: var(--accent-color);
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            color: var(--pure-white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            margin-top: 60px;
+            background: linear-gradient(rgba(11, 12, 16, 0.8), rgba(11, 12, 16, 0.9)), 
+                        url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            color: var(--pure-white);
+            margin-bottom: 20px;
+        }
+        .hero h1 span {
+            color: var(--accent-color);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--accent-color);
+            cursor: pointer;
+        }
+
+        /* Games Section */
+        .sections {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--pure-white);
+            margin-bottom: 50px;
+        }
+        .section-title span {
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        .game-card {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+        .game-img {
+            width: 100%;
+            height: 180px;
+            background: #151c24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            border-bottom: 1px solid #2d3748;
+        }
+        .game-info {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .game-info h3 {
+            color: var(--pure-white);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        .game-info p {
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            color: #a0aec0;
+            min-height: 70px;
+        }
+
+        /* Contact Footer */
+        footer {
+            background-color: #050508;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid #1f2833;
+            margin-top: 40px;
+        }
+        footer p {
+            margin-bottom: 15px;
+        }
+        .socials a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">Pixel Craft</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#games">My Games Arcade</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <h1>My <span>Arcade</span> Universe</h1>
+        <p>Welcome to my game development headquarters. Below you can find and play all the games I am creating, all directly from one space.</p>
+        <a href="#games" class="btn">Explore Games</a>
+    </section>
+
+    <section class="sections" id="games">
+        <h2 class="section-title">Play My <span>Games</span></h2>
+        <div class="game-grid">
+            
+            <div class="game-card">
+                <div class="game-img">🃏</div>
+                <div class="game-info">
+                    <div>
+                        <h3>Dungeon & Draft</h3>
+                        <p>A strategic card-battler roguelike. Pick your cards carefully, attack monsters, and spend your health wisely to survive the depths.</p>
+                    </div>
+                    <a href="cards.html" class="btn">Play Card Game</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-img">🧱</div>
+                <div class="game-info">
+                    <div>
+                        <h3>Neon Breakout</h3>
+                        <p>A glowing arcade classic. Slide the reflective neon paddle to bounce the tracker sphere and shatter security grids for high scores!</p>
+                    </div>
+                    <a href="breakout.html" class="btn">Play Breakout</a>
+                </div>
+            </div>
+           <div class="game-card">               
+               <div class="game-img">🎯</div>
+                <div class="game-info">
+                    <div>
+                        <h3>Vector Vortex</h3>
+                        <p>An intense, fast-paced action arcade shooter inspired by offline screen games. Blast waves of incoming targets and capture cores to level up!</p>
+                    </div>
+                    <a href="vortex.html" class="btn">Play Arcade Game</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Pixel Craft Games. All rights reserved.</p>
+        <div class="socials">
+            <a href="#">Twitter</a> | 
+            <a href="#">Discord</a> | 
+            <a href="#">YouTube</a>
+        </div>
+    </footer>
+
+</body>
+</html>

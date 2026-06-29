@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Vortex - Auto Fire Edition</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050508;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #gameCanvas {
+            border: 3px solid #00ffcc;
+            box-shadow: 0 0 20px #00ffcc;
+            background-color: #0a0a14;
+        }
+        .instructions {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ui" style="position: absolute; top: 20px; font-size: 20px; width: 800px; display: flex; justify-content: space-between; padding: 0 10px; box-sizing: border-box; color: #00ffcc; text-shadow: 0 0 10px #00ffcc;">
+    <div id="scoreDisplay">SCORE: 0</div>
+    <div id="levelDisplay">LEVEL: 1 (Cores: 0/3)</div>
+    <div id="livesDisplay">LIVES: 3</div>
+</div>
+
+<canvas id="gameCanvas" width="800" height="500"></canvas>
+<div class="instructions">Use <b>MOUSE</b> to Glide & Aim | Firing is <b>AUTOMATIC</b> | Collect <b>GREEN CORES</b> to Level Up!</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Game State Variables
+let player = { x: 400, y: 250, size: 15, angle: 0, lives: 3 };
+let bullets = [];
+let enemies = [];
+let cores = [];
+let score = 0;
+let level = 1;
+let coresCollected = 0;
+let coresNeeded = 3;
+let gameOver = false;
+let mouse = { x: 400, y: 250 };
+
+// AUTO-FIRE SYSTEM VARIABLES
+let fireRate = 120; // Fires a bullet every 120 milliseconds (super fast!)
+let lastFired = 0;
+
+// Track Mouse Movement
+window.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+
+// Click to restart if game over
+window.addEventListener('mousedown', () => {
+    if (gameOver) resetGame();
+});
+
+function fireBullet(currentTime) {
+    if (gameOver) return;
+    if (currentTime - lastFired < fireRate) return; // Wait until cooldown finishes
+
+    lastFired = currentTime;
+
+    // Calculate base vector direction toward mouse
+    let dx = mouse.x - player.x;
+    let dy = mouse.y - player.y;
+    let baseAngle = Math.atan2(dy, dx);
+
+    // To create a "multiple fire shots" chaotic arcade feel, we add a tiny random spread angle
+    let spread = (Math.random() - 0.5) * 0.15; 
+    let finalAngle = baseAngle + spread;
+
+    bullets.push({
+        x: player.x + Math.cos(baseAngle) * player.size,
+        y: player.y + Math.sin(baseAngle) * player.size,
+        vx: Math.cos(finalAngle) * 9, // Increased speed for rapid fire feel
+        vy: Math.sin(finalAngle) * 9,
+        size: 3.5
+    });
+}
+
+function spawnEnemy() {
+    if (gameOver) return;
+    let x, y;
+    if (Math.random() < 0.5) {
+        x = Math.random() < 0.5 ? 0 : canvas.width;
+        y = Math.random() * canvas.height;
+    } else {
+        x = Math.random() * canvas.width;
+        y = Math.random() < 0.5 ? 0 : canvas.height;
+    }
+    enemies.push({ x: x, y: y, speed: 1.2 + (level * 0.3), size: 12 });
+}
+
+function spawnCore() {
+    if (gameOver) return;
+    cores.push({
+        x: Math.random() * (canvas.width - 100) + 50,
+        y: Math.random() * (canvas.height - 100) + 50,
+        size: 10
+    });
+}
+
+// Spawning Intervals
+setInterval(spawnEnemy, 1200); // Enemies spawn slightly faster now to match the higher firepower
+setInterval(spawnCore, 4000);
+
+function resetGame() {
+    player.lives = 3;
+    player.x = 400;
+    player.y = 250;
+    bullets = [];
+    enemies = [];
+    cores = [];
+    score = 0;
+    level = 1;
+    coresCollected = 0;
+    coresNeeded = 3;
+    gameOver = false;
+}
+
+function update(timestamp) {
+    if (gameOver) return;
+
+    // 1. Run the Automatic Weapon system
+    fireBullet(timestamp);
+
+    // 2. Smoothly glide player toward mouse coordinates
+    player.x += (mouse.x - player.x) * 0.07;
+    player.y += (mouse.y - player.y) * 0.07;
+    player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+
+    // 3. Move Bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].x += bullets[i].vx;
+        bullets[i].y += bullets[i].vy;
+        if (bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height) {
+            bullets.splice(i, 1);
+        }
+    }
+
+    // 4. Move Enemies towards Player
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        let dx = player.x - enemies[i].x;
+        let dy = player.y - enemies[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        enemies[i].x += (dx / dist) * enemies[i].speed;
+        enemies[i].y += (dy / dist) * enemies[i].speed;
+
+        if (dist < player.size + enemies[i].size) {
+            enemies.splice(i, 1);
+            player.lives--;
+            if (player.lives <= 0) gameOver = true;
+            continue;
+        }
+
+        // Bullet hitting enemies check
+        for (let j = bullets.length - 1; j >= 0; j--) {
+            let bDx = bullets[j].x - enemies[i].x;
+            let bDy = bullets[j].y - enemies[i].y;
+            let bDist = Math.sqrt(bDx * bDx + bDy * bDy);
+            
+            if (bDist < enemies[i].size + bullets[j].size) {
+                enemies.splice(i, 1);
+                bullets.splice(j, 1);
+                score += 10;
+                break;
+            }
+        }
+    }
+
+    // 5. Collect Green Cores
+    for (let i = cores.length - 1; i >= 0; i--) {
+        let dx = player.x - cores[i].x;
+        let dy = player.y - cores[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < player.size + cores[i].size) {
+            cores.splice(i, 1);
+            coresCollected++;
+            score += 50;
+
+            if (coresCollected >= coresNeeded) {
+                level++;
+                coresCollected = 0;
+                coresNeeded += 2;
+                enemies = []; 
+            }
+        }
+    }
+
+    // Update Text displays
+    document.getElementById('scoreDisplay').innerText = "SCORE: " + score;
+    document.getElementById('levelDisplay').innerText = `LEVEL: ${level} (Cores: ${coresCollected}/${coresNeeded})`;
+    document.getElementById('livesDisplay').innerText = "LIVES: " + player.lives;
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (gameOver) {
+        ctx.fillStyle = '#ff3333';
+        ctx.font = '36px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText("SYSTEM CRASH: GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = '20px Courier New';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText("Click Anywhere to Reboot Arena", canvas.width / 2, canvas.height / 2 + 30);
+        return;
+    }
+
+    // Draw Cores
+    cores.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 255, 100, 0.2)';
+        ctx.fill();
+        ctx.strokeStyle = '#00ff64';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+
+    // Draw Enemies
+    enemies.forEach(e => {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+        ctx.beginPath();
+        ctx.moveTo(0, -e.size);
+        ctx.lineTo(e.size, 0);
+        ctx.lineTo(0, e.size);
+        ctx.lineTo(-e.size, 0);
+        ctx.closePath();
+        ctx.fillStyle = '#ff3366';
+        ctx.fill();
+        ctx.restore();
+    });
+
+    // Draw Bullets (Sleek laser lines for continuous effect)
+    bullets.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+        ctx.fillStyle = '#00ffff';
+        ctx.fill();
+    });
+
+    // Draw Player Ship
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+    ctx.beginPath();
+    ctx.moveTo(player.size * 1.5, 0);
+    ctx.lineTo(-player.size, -player.size);
+    ctx.lineTo(-player.size, player.size);
+    ctx.closePath();
+    ctx.fillStyle = '#00ffcc';
+    ctx.fill();
+    ctx.restore();
+}
+
+function gameLoop(timestamp) {
+    update(timestamp);
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+// Start game loop
+requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>
