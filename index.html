@@ -40,7 +40,6 @@ body::before {
     background-size: 100% 4px, 6px 100%;
     pointer-events: none; 
 }
-        }
 
         header {
             background: linear-gradient(135deg, #181a26, #0d0e15);
@@ -198,6 +197,14 @@ body::before {
             </div>
         </div>
 
+        <div class="game-card" onclick="playGame('retrosnake.html')">
+            <div class="game-thumb">🐍<span class="badge">Live</span></div>
+            <div class="game-info">
+                <div class="game-title">4. Retro Snake</div>
+                <p class="game-desc">Eat neon pixels and grow longer without biting your own tail.</p>
+            </div>
+        </div>
+
         <div class="game-card" onclick="playGame('vortex.html')">
             <div class="game-thumb">🌀<span class="badge">Live</span></div>
             <div class="game-info">
@@ -327,7 +334,7 @@ body::before {
         const grid = document.getElementById('grid');
 
         // Loop to generate 97 unique entries sequentially from index 4 to 100
-        for (let i = 4; i <= 100; i++) {
+        for (let i = 5; i <= 100; i++) {
             const blueprint = uniqueDatabase[i - 4];
             
             const card = document.createElement('div');
